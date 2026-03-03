@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
         trim:true,
         index:true
     },
-    avatar:{
+    avtar:{
         type:String,
         required:true,
         //cloudnary service

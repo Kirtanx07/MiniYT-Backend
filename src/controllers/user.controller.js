@@ -12,12 +12,11 @@ const registerUser = asyncHandler(async (req, res) => {
 
     //validation-Not Empty
 
-    if ([fullName,email,username.password].some((field) => {
-        field?.trim() === ""
-
-    })){
-        throw new ApiError(400,"All Fileds are required and should not be empty is Required")
-       }
+    if ([fullName, email, username, password].some(
+    (field) => field?.trim() === ""
+)) {
+    throw new ApiError(400, "All fields are required");
+}
 
     //check if user already exists: username and email
 
@@ -30,10 +29,14 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     //files-avtar and cover image!check
-    const avtarlocalPath = req.files?.avtar[0]?.path;
-    const coverImagePath = req.files?.coverImage[0]?.path;
+    console.log("FILES:", req.files);
+    //const avtarlocalPath = req.files?.avtar[0]?.path;
+    //const coverImagePath = req.files?.coverImage[0]?.path;
+    const avtarlocalPath = req.files?.avtar?.[0]?.path;
+    const coverImagePath = req.files?.coverImage?.[0]?.path;
+    
 
-    if (avtarlocalPath) {
+    if (!avtarlocalPath) {
         throw new ApiError(400,"Avtar File is Required!")
     }
     //upload them to cloudnary-reference url //avtar check
@@ -41,12 +44,12 @@ const registerUser = asyncHandler(async (req, res) => {
     const coverImage = await uploadOnCloudinary(coverImagePath)
 
     if (!avtar) {
-        throw ApiError(400,"Avtar file is Required!")
+        throw new ApiError(400,"Avtar file is Required!")
     }
 
     
     //create user object -- create entry in db
-    await User.create({
+    const User = await User.create({
         fullName,
         avtar:avtar.url,
         coverImage: coverImage?.url || "",
@@ -62,7 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     
     //check for user creation
-    if (createdUser) {
+    if (!createdUser) {
         throw new ApiError(500,"Something went wrong while Registering the user")
     }
 
