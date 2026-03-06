@@ -217,7 +217,7 @@ const refreshAccessToken = asyncHandler (async(req,res) => {
     
         const {accessToken,newrefreshToken} = await generateAccessAndRefereshTokens(user._id)
         return res
-        .status
+        .status(200)
         .cookie("accessToken",accessToken,options)
         .cookie("refrehToken",newrefreshToken,options)
         .json(
@@ -239,7 +239,7 @@ const refreshAccessToken = asyncHandler (async(req,res) => {
 const changeCurrentPassword = asyncHandler(async(req,rees) => {
     const {oldPassworrd,newPassword} = req.body
     const user = await User.findById(req.user?._id)
-    const isPasswordCorrect = user.isPasswordCorrect(oldPassworrd)
+    const isPasswordCorrect = user.isPasswordCorrect(oldPassword)
 
     if(isPasswordCorrect){
         throw new ApiError(400, "Invalid Old Password-9");
@@ -263,7 +263,7 @@ const changeCurrentPassword = asyncHandler(async(req,rees) => {
 const getCurrentUser = asyncHandler(async(req,res) => {
     return res
     .status(200)
-    .json(200,req.user,"Current user fetched Succesfully")
+    .json(new ApiResponse(200, req.user, "Current user fetched Successfully"))
 
 });
 
@@ -315,9 +315,7 @@ const updateUserAvtar = asyncHandler(async(req,res) => {
     const user = await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                avatar: avtarLocalPath
-            }
+            $set: { avtar: avtar.url }
         },
         {
             new:true
