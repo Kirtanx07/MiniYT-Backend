@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import path from "path";
+import { ApiError } from "./ApiError";
 
 // 1. Configure Cloudinary inside the function so it catches the .env variables
 const uploadOnCloudinary = async (localFilePath) => {
@@ -15,15 +16,6 @@ const uploadOnCloudinary = async (localFilePath) => {
 
         const absolutePath = path.resolve(localFilePath);
 
-        // 🚨 BIG TEST: Measure the file size before uploading
-        const stats = fs.statSync(absolutePath);
-        console.log(`\n📦 BIG TEST - FILE PATH: ${absolutePath}`);
-        console.log(`⚖️ BIG TEST - FILE SIZE: ${stats.size} bytes`);
-
-        if (stats.size === 0) {
-            console.error("❌ ERROR: The file is 0 bytes! Postman corrupted it.");
-            return null; // Stop the upload
-        }
 
         const response = await cloudinary.uploader.upload(absolutePath, {
             resource_type: "auto"
@@ -40,4 +32,26 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 };
 
-export { uploadOnCloudinary };
+const deleteFromCloudinary = async(cloudinaryVideoUrl, resourceType = "video") =>{
+    try {
+        cloudinary.config({
+          cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+          api_key: process.env.CLOUDINARY_API_KEY,
+          api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
+    if (!cloudinaryVideoUrl) return null;
+    const publicId = cloudinaryVideoUrl.split("/").pop().split(".")[0];
+
+    const response = await cloudinary.uploader.destroy(publicId, {
+            resource_type: resourceType
+        });
+        
+
+    } catch (error) {
+        console.error("Cloudinary Delete Error:", error);
+        return null;
+        
+    }
+
+};
+export { uploadOnCloudinary , deleteFromCloudinary };
