@@ -18,5 +18,5 @@ const commentSchema = new Schema({
 },{timestamps:true})
 
 
-commentSchemaSchema.plugin(mongooseAggregatePaginate)
-export const Video = mongoose.model("Video",videoSchema)
+commentSchema.plugin(mongooseAggregatePaginate)
+export const Comment = mongoose.model("Comment",commentSchema)
