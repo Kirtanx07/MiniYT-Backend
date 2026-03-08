@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import path from "path";
-import { ApiError } from "./ApiError";
+import { ApiError } from "./ApiError.js"; 
 
 // 1. Configure Cloudinary inside the function so it catches the .env variables
 const uploadOnCloudinary = async (localFilePath) => {

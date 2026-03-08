@@ -1,18 +1,21 @@
 import dotenv from "dotenv";
-dotenv.config({ path: "./.env" }); // Force it to look at the root directory
+import connectDB from "./db/index.js";
+import { app } from "./app.js";
+import { checkConnections } from "./utils/connectionCheck.js";
 
-import connectDb from "./db/index.js"
-import { app } from "./app.js"
+dotenv.config({ path: './.env' });
 
+connectDB()
+    .then(async () => {
+        // Run the utility check here
+        await checkConnections();
 
-const PORT = process.env.PORT || 8000
-
-connectDb()
-.then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`)
+        const port = process.env.PORT || 8000;
+        app.listen(port, () => {
+            console.log(`⚙️  Server is running at port : ${port}`);
+        });
     })
-})
-.catch(() => {
-    console.log("MONGO db Connection failed!!!")
-})
+    .catch((err) => {
+        console.log("MONGO db connection failed !!! ", err);
+        process.exit(1);
+    });

@@ -1,31 +1,28 @@
-import { asyncHandler } from "../src/utils/asyncHandler.js";
-import { ApiError } from "../src/utils/ApiError.js";
+// Corrected: Removed "src/" because models and middlewares are at the same level
+import { asyncHandler } from "../src/utils/asyncHandler.js"; 
+import { ApiError } from "../src/utils/ApiError.js";         
 import jwt from "jsonwebtoken";
-import { User } from "../models/user.model.js";
+import { User } from "../models/user.model.js"; // Pointing to root/models
 
-
-export const verifyJWT = asyncHandler(async(req,_,next) => {
+export const verifyJWT = asyncHandler(async(req, _, next) => {
     try {
-        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer" , "")
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
     
         if (!token) {
-            throw new ApiError(401,"Unauthorized requst!!!!");
-            
+            throw new ApiError(401, "Unauthorized request!");
         }
     
-        const decodedToken = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)
+        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     
-        const user = await User.findById(decodedToken?._id).select("-password -refreshToken")
+        const user = await User.findById(decodedToken?._id).select("-password -refreshToken");
     
         if (!user) {
-            //frontend 
-            throw new ApiError(401,"Invaild acces Token-4");
+            throw new ApiError(401, "Invalid access token");
         }
     
-        req.user = user ;
-        next()
+        req.user = user;
+        next();
     } catch (error) {
-        throw new ApiError(401 , error?.message || "Invalid access token");
+        throw new ApiError(401, error?.message || "Invalid access token");
     }
-
-})
+});
